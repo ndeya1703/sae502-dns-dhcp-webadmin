@@ -1,0 +1,38 @@
+---
+- name: Configuration du serveur DHCP
+  hosts: dns_dhcp_web
+  become: yes
+
+  tasks:
+    - name: Mettre à jour le cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installer le serveur DHCP
+      apt:
+        name: isc-dhcp-server
+        state: present
+
+    - name: Copier le fichier dhcpd.conf
+      copy:
+        src: ../dhcp/dhcpd.conf
+        dest: /etc/dhcp/dhcpd.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Configurer l’interface réseau DHCP
+      copy:
+        content: |
+          INTERFACESv4="eth0"
+        dest: /etc/default/isc-dhcp-server
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Activer et démarrer le service DHCP
+      service:
+        name: isc-dhcp-server
+        state: started
+        enabled: yes
