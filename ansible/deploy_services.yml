@@ -1,0 +1,52 @@
+- name: Déployer les services DNS/DHCP/Web
+  hosts: all
+  become: yes
+  tasks:
+    - name: Créer répertoires
+      file:
+        path: "/opt/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - dns
+        - dhcp
+        - webadmin
+        - docker
+
+    - name: Copier fichiers DNS
+      copy:
+        src: "../dns/"
+        dest: "/opt/dns/"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copier fichiers DHCP
+      copy:
+        src: "../dhcp/"
+        dest: "/opt/dhcp/"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copier fichiers Web admin
+      copy:
+        src: "../webadmin/"
+        dest: "/opt/webadmin/"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copier docker-compose.yml
+      copy:
+        src: "../docker/docker-compose.yml"
+        dest: "/opt/docker/docker-compose.yml"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Lancer les conteneurs
+      community.docker.docker_compose:
+        project_src: /opt/docker/
+        state: present
+        restarted: yes

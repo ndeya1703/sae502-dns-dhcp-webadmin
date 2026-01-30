@@ -1,0 +1,4 @@
+zone "mondomaine.local" {
+    type master;
+    file "/etc/bind/db.mondomaine.local";
+};

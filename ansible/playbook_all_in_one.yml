@@ -1,0 +1,56 @@
+- name: Déploiement DNS / DHCP / Web Admin (sans Docker)
+  hosts: all
+  become: yes
+  vars:
+    packages:
+      - bind9
+      - isc-dhcp-server
+      - apache2
+
+  tasks:
+
+    - name: Installer DNS, DHCP et Web
+      apt:
+        name: "{{ packages }}"
+        state: present
+
+    - name: Activer et démarrer Bind9 (DNS)
+      service:
+        name: bind9
+        state: started
+        enabled: yes
+
+    - name: Activer et démarrer DHCP
+      service:
+        name: isc-dhcp-server
+        state: started
+        enabled: yes
+
+    - name: Activer et démarrer Apache
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Vérification DNS
+      command: systemctl is-active bind9
+      register: dns_status
+      changed_when: false
+
+    - name: Vérification DHCP
+      command: systemctl is-active isc-dhcp-server
+      register: dhcp_status
+      changed_when: false
+
+    - name: Vérification Web
+      command: systemctl is-active apache2
+      register: web_status
+      changed_when: false
+
+    - name: Résumé des services
+      debug:
+        msg:
+          - "DNS: {{ dns_status.stdout }}"
+          - "DHCP: {{ dhcp_status.stdout }}"
+          - "WEB: {{ web_status.stdout }}"
+

@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  bind9:
+    image: internetsystemsconsortium/bind9:9.16
+    container_name: bind9
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - ./dns/named.conf.local:/etc/bind/named.conf.local:ro
+      - ./dns/db.mondomaine.local:/etc/bind/db.mondomaine.local:ro
+    restart: always
+
+  dhcp:
+    image: networkboot/dhcpd:latest
+    container_name: isc-dhcp-server
+    ports:
+      - "67:67/udp"
+    volumes:
+      - ./dhcp/dhcpd.conf:/etc/dhcp/dhcpd.conf:ro
+    restart: always
+    cap_add:
+      - NET_ADMIN  # nécessaire pour attribuer des IP sur le réseau
+
+  webadmin:
+    image: nginx:alpine
+    container_name: webadmin
+    ports:
+      - "8080:80"
+    volumes:
+      - ./webadmin:/usr/share/nginx/html:ro
+      - ./dns:/mnt/dns:ro
+      - ./dhcp:/mnt/dhcp:ro
+    restart: always
+version: "3.8"
+
+services:
+  bind9:
+    image: internetsystemsconsortium/bind9:9.16
+    container_name: bind9
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - ./dns/named.conf.local:/etc/bind/named.conf.local:ro
+      - ./dns/db.mondomaine.local:/etc/bind/db.mondomaine.local:ro
+    restart: always
+
+  dhcp:
+    image: networkboot/dhcpd:latest
+    container_name: isc-dhcp-server
+    ports:
+      - "67:67/udp"
+    volumes:
+      - ./dhcp/dhcpd.conf:/etc/dhcp/dhcpd.conf:ro
+    restart: always
+    cap_add:
+      - NET_ADMIN  # nécessaire pour attribuer des IP sur le réseau
+
+  webadmin:
+    image: nginx:alpine
+    container_name: webadmin
+    ports:
+      - "8080:80"
+    volumes:
+      - ./webadmin:/usr/share/nginx/html:ro
+      - ./dns:/mnt/dns:ro
+      - ./dhcp:/mnt/dhcp:ro
+    restart: always

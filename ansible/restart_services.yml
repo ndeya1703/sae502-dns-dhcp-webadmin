@@ -1,0 +1,8 @@
+- name: Redémarrer tous les services
+  hosts: all
+  become: yes
+  tasks:
+    - name: Redémarrer les conteneurs
+      community.docker.docker_compose:
+        project_src: /opt/docker/
+        state: restarted
